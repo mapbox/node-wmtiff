@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+
+var path = require('path');
+var gdal = require('gdal');
+
+var smtiff = require('../index.js');
+
+if (!process.argv[3]) {
+  console.log('Reproject a TIFF into Spherical Mercator');
+  console.log('Usage: smtiff <srcpath> <dstpath>');
+  process.exit(1);
+}
+
+var srcpath = path.resolve(process.argv[2]);
+var dstpath = path.resolve(process.argv[3]);
+
+smtiff.reproject(srcpath, dstpath, function(err) {
+  console.log('done');
+});
