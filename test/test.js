@@ -40,6 +40,7 @@ tape('reproject', function(assert) {
           assert.equal(src.geoTransform[i], ctrl.geoTransform[i]);
         }
         
+        fs.unlink(dstpath);
       });
     }
     
