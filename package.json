@@ -1,0 +1,22 @@
+{
+  "name": "wmtiff",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "author": "Mapbox (https://www.mapbox.com)",
+  "dependencies": {
+    "gdal": "^0.4.1"
+  },
+  "engines": {
+    "node": "0.10.x"
+  },
+  "devDependencies": {
+    "tape": "3.0.x"
+  },
+  "bin": {
+    "wmtiff": "bin/wmtiff"
+  },
+  "scripts": {
+    "test": "tape test/*.js"
+  }
+}
