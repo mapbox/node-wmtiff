@@ -40,13 +40,24 @@ function getExtent(srcProjection, dstProjection, srcWidth, srcHeight, srcAffine)
 }
 
 
+function getNoDataValues(src) {
+  
+  var bands = Array.apply(null, {length: src.bands.count()}).map(Number.call, Number);
+  
+  return bands.map(function(idx) {
+    return src.bands.get(idx + 1).noDataValue;
+  });
+  
+}
+
+
 function reproject(srcpath, dstpath, callback) {
   
   var src = gdal.open(srcpath);
   
   var width = src.rasterSize.x;
   var height = src.rasterSize.y;
-  var band_count = src.bands.count();
+  var bandCount = src.bands.count();
   var driver = src.driver.description;
   var srcAffine = src.geoTransform;
   var srcProjection = src.srs;
@@ -59,9 +70,14 @@ function reproject(srcpath, dstpath, callback) {
   var dstWidth = ~~((dstExtent.maxX - dstExtent.minX) / dstResolution + 0.5);
   var dstHeight = ~~((dstExtent.maxY - dstExtent.minY) / dstResolution + 0.5);
   
-  var dst = gdal.open(dstpath, mode='w', 'GTiff', dstWidth, dstHeight, band_count, gdal.GDT_UInt16);
+  var dst = gdal.open(dstpath, mode='w', 'GTiff', dstWidth, dstHeight, bandCount, gdal.GDT_UInt16);
   dst.srs = dstProjection;
   dst.geoTransform = [dstExtent.minX, dstResolution, srcAffine[2], dstExtent.maxY, srcAffine[4], -dstResolution];
+  
+  var noDataValues = getNoDataValues(src);
+  dst.bands.forEach(function(band) {
+    band.noDataValue = noDataValues[band.id - 1];
+  });
   
   var opts = {
     src: src,
