@@ -79,19 +79,10 @@ function reproject(srcpath, dstpath, callback) {
   
   var dstWidth = ~~((dstExtent.maxX - dstExtent.minX) / dstResolution + 0.5);
   var dstHeight = ~~((dstExtent.maxY - dstExtent.minY) / dstResolution + 0.5);
-  
+    
   var dst = gdal.open(dstpath, mode='w', 'GTiff', dstWidth, dstHeight, bandCount, gdal.GDT_UInt16);
   dst.srs = dstProjection;
   dst.geoTransform = [dstExtent.minX, dstResolution, srcAffine[2], dstExtent.maxY, srcAffine[4], -dstResolution];
-  
-  
-  var colorInterps = getColorInterpretation(src);
-  var noDataValues = getNoDataValues(src);
-  dst.bands.forEach(function(band) {
-    band.colorInterpretation = colorInterps[band.id - 1];
-    band.noDataValue = noDataValues[band.id - 1];
-  });
-  
   
   var opts = {
     src: src,
@@ -100,6 +91,13 @@ function reproject(srcpath, dstpath, callback) {
     t_srs: dstProjection
   };
   gdal.reprojectImage(opts);
+  
+  var colorInterps = getColorInterpretation(src);
+  var noDataValues = getNoDataValues(src);
+  dst.bands.forEach(function(band) {
+    band.colorInterpretation = colorInterps[band.id - 1];
+    band.noDataValue = noDataValues[band.id - 1];
+  });
   
   src.close();
   dst.close();
