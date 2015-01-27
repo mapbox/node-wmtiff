@@ -51,6 +51,16 @@ function getNoDataValues(src) {
 }
 
 
+function getColorInterpretation(src) {
+  
+  var bands = Array.apply(null, {length: src.bands.count()}).map(Number.call, Number);
+  
+  return bands.map(function(idx) {
+    return src.bands.get(idx + 1).colorInterpretation;
+  });
+}
+
+
 function reproject(srcpath, dstpath, callback) {
   
   var src = gdal.open(srcpath);
@@ -74,10 +84,14 @@ function reproject(srcpath, dstpath, callback) {
   dst.srs = dstProjection;
   dst.geoTransform = [dstExtent.minX, dstResolution, srcAffine[2], dstExtent.maxY, srcAffine[4], -dstResolution];
   
+  
+  var colorInterps = getColorInterpretation(src);
   var noDataValues = getNoDataValues(src);
   dst.bands.forEach(function(band) {
+    band.colorInterpretation = colorInterps[band.id - 1];
     band.noDataValue = noDataValues[band.id - 1];
   });
+  
   
   var opts = {
     src: src,
