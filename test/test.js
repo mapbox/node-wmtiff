@@ -38,12 +38,15 @@ tape('reproject', function(assert) {
 
       wmtiff.reproject(srcpath, dstpath, function(error) {
 
+        var original = gdal.open(srcpath);
         var src = gdal.open(dstpath);
         var ctrl = gdal.open(ctrlpath);
 
         for (var j = 0; i < src.geoTransform.length; i += 1) {
           equalEnough(assert, src.geoTransform[i], ctrl.geoTransform[i]);
         }
+
+        assert.equal(src.bands.get(1).dataType, original.bands.get(1).dataType);
 
         fs.unlink(dstpath);
       });
