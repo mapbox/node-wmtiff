@@ -4,42 +4,6 @@ var gdal = require('gdal');
 module.exports = {};
 module.exports.reproject = reproject;
 
-
-function getSpatialResolution(srcProjection, dstProjection, srcWidth, srcHeight, srcAffine) {
-
-  var transform = new gdal.CoordinateTransformation(srcProjection, dstProjection);
-  var srcDiagonal = new gdal.LineString();
-
-  srcDiagonal.points.add(srcAffine[0], srcAffine[3]);
-  srcDiagonal.points.add(srcAffine[0] + srcAffine[1] * srcWidth, srcAffine[3] + srcAffine[5] * srcHeight);
-
-  var dstDiagonal = srcDiagonal.clone();
-  dstDiagonal.transform(transform);
-
-  var nPixels = Math.sqrt(srcWidth * srcWidth + srcHeight * srcHeight);
-
-  return dstDiagonal.getLength() / nPixels;
-}
-
-
-function getExtent(srcProjection, dstProjection, srcWidth, srcHeight, srcAffine) {
-
-  var transform = new gdal.CoordinateTransformation(srcProjection, dstProjection);
-
-  var ul = transform.transformPoint(srcAffine[0], srcAffine[3]);
-  var ur = transform.transformPoint(srcAffine[0] + srcAffine[1] * srcWidth, srcAffine[3]);
-  var lr = transform.transformPoint(srcAffine[0] + srcAffine[1] * srcWidth, srcAffine[3] + srcAffine[5] * srcHeight);
-  var ll = transform.transformPoint(srcAffine[0], srcAffine[3] + srcAffine[5] * srcHeight);
-
-  return {
-    minX: Math.min(ll.x, ul.x),
-    minY: Math.min(ll.y, lr.y),
-    maxX: Math.max(ur.x, lr.x),
-    maxY: Math.max(ul.y, ur.y)
-  };
-}
-
-
 function getNoDataValues(src) {
 
   var bands = Array.apply(null, {length: src.bands.count()}).map(Number.call, Number);
@@ -50,7 +14,6 @@ function getNoDataValues(src) {
 
 }
 
-
 function getColorInterpretation(src) {
 
   var bands = Array.apply(null, {length: src.bands.count()}).map(Number.call, Number);
@@ -60,49 +23,35 @@ function getColorInterpretation(src) {
   });
 }
 
-
 function reproject(srcpath, dstpath, callback) {
-
   var src = gdal.open(srcpath);
 
-  var width = src.rasterSize.x;
-  var height = src.rasterSize.y;
   var bandCount = src.bands.count();
-  var driver = src.driver.description;
-  var srcAffine = src.geoTransform;
-  var srcProjection = src.srs;
-
-  var dstProjection = gdal.SpatialReference.fromUserInput('EPSG:3857');
-
-  var dstExtent = getExtent(srcProjection, dstProjection, width, height, srcAffine);
-  var dstResolution = getSpatialResolution(srcProjection, dstProjection, width, height, srcAffine);
-
-  var dstWidth = ~~((dstExtent.maxX - dstExtent.minX) / dstResolution + 0.5);
-  var dstHeight = ~~((dstExtent.maxY - dstExtent.minY) / dstResolution + 0.5);
-
   var dataType = src.bands.get(1).dataType;
 
-  var dst = gdal.open(dstpath, mode='w', 'GTiff', dstWidth, dstHeight, bandCount, dataType);
-  dst.srs = dstProjection;
-  dst.geoTransform = [dstExtent.minX, dstResolution, srcAffine[2], dstExtent.maxY, srcAffine[4], -dstResolution];
-
-  var opts = {
+  var options = {
     src: src,
-    dst: dst,
-    s_srs: srcProjection,
-    t_srs: dstProjection
+    s_srs: src.srs,
+    t_srs: gdal.SpatialReference.fromEPSG(3857)
   };
-  gdal.reprojectImage(opts);
+
+  var info = gdal.suggestedWarpOutput(options);
+
+  options.dst = gdal.open(dstpath, 'w', 'GTiff', info.rasterSize.x, info.rasterSize.y, bandCount, dataType);
+  options.dst.geoTransform = info.geoTransform;
+
+  gdal.reprojectImage(options);
 
   var colorInterps = getColorInterpretation(src);
   var noDataValues = getNoDataValues(src);
-  dst.bands.forEach(function(band) {
+
+  options.dst.bands.forEach(function(band) {
     band.colorInterpretation = colorInterps[band.id - 1];
     band.noDataValue = noDataValues[band.id - 1];
   });
 
   src.close();
-  dst.close();
+  options.dst.close();
 
   return callback(null);
 }

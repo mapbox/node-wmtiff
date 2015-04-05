@@ -37,7 +37,6 @@ tape('reproject', function(assert) {
       var ctrlpath = path.join(datadir, 'control', filename);
 
       wmtiff.reproject(srcpath, dstpath, function(error) {
-
         var original = gdal.open(srcpath);
         var src = gdal.open(dstpath);
         var ctrl = gdal.open(ctrlpath);
@@ -52,12 +51,10 @@ tape('reproject', function(assert) {
       });
     }
 
-
     assert.end();
   });
 
 });
-
 
 tape('teardown', function (test) {
 
