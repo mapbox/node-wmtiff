@@ -39,6 +39,7 @@ function reproject(srcpath, dstpath) {
 
   options.dst = gdal.open(dstpath, 'w', 'GTiff', info.rasterSize.x, info.rasterSize.y, bandCount, dataType);
   options.dst.geoTransform = info.geoTransform;
+  options.dst.srs = options.t_srs;
 
   gdal.reprojectImage(options);
 
