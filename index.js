@@ -23,7 +23,7 @@ function getColorInterpretation(src) {
   });
 }
 
-function reproject(srcpath, dstpath, callback) {
+function reproject(srcpath, dstpath) {
   var src = gdal.open(srcpath);
 
   var bandCount = src.bands.count();
@@ -52,6 +52,4 @@ function reproject(srcpath, dstpath, callback) {
 
   src.close();
   options.dst.close();
-
-  return callback(null);
 }
