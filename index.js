@@ -32,12 +32,26 @@ function reproject(srcpath, dstpath) {
   var options = {
     src: src,
     s_srs: src.srs,
-    t_srs: gdal.SpatialReference.fromEPSG(3857)
+    t_srs: gdal.SpatialReference.fromEPSG(3857),
+    options: ['NUM_THREADS=ALL_CPUS']
   };
 
   var info = gdal.suggestedWarpOutput(options);
 
-  options.dst = gdal.open(dstpath, 'w', 'GTiff', info.rasterSize.x, info.rasterSize.y, bandCount, dataType);
+  var creationOptions = [
+    'TILED=YES',
+    'BLOCKXSIZE=512',
+    'BLOCKYSIZE=512'
+  ];
+
+  options.dst = gdal.open(
+    dstpath, 'w', 'GTiff',
+    info.rasterSize.x, info.rasterSize.y,
+    bandCount,
+    dataType,
+    creationOptions
+  );
+
   options.dst.geoTransform = info.geoTransform;
   options.dst.srs = options.t_srs;
 
