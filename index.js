@@ -24,6 +24,12 @@ function getColorInterpretation(src) {
 }
 
 function reproject(srcpath, dstpath) {
+
+  var max_ram = 1500; //in MB, will use double the value: 1x GDAL_CACHE, 1x gdalwarp cache
+
+  process.env.UV_THREADPOOL_SIZE = Math.ceil(Math.max(4, require('os').cpus().length * 1.5));
+  gdal.config.set('GDAL_CACHEMAX', max_ram.toString());
+
   var src = gdal.open(srcpath);
 
   var bandCount = src.bands.count();
@@ -33,6 +39,7 @@ function reproject(srcpath, dstpath) {
     src: src,
     s_srs: src.srs,
     t_srs: gdal.SpatialReference.fromEPSG(3857),
+    memoryLimit: max_ram * 1024 * 1024,
     options: ['NUM_THREADS=ALL_CPUS']
   };
 
@@ -54,6 +61,14 @@ function reproject(srcpath, dstpath) {
 
   options.dst.geoTransform = info.geoTransform;
   options.dst.srs = options.t_srs;
+
+  console.log('process.env.UV_THREADPOOL_SIZE:',process.env.UV_THREADPOOL_SIZE);
+  console.log('bandCount:', bandCount);
+  console.log('blocksize:', src.bands.get(1).blockSize);
+  console.log('info.rasterSize.x:', info.rasterSize.x);
+  console.log('info.rasterSize.y:', info.rasterSize.y);
+  console.log('dataType:', dataType);
+  console.log('options:', options);
 
   gdal.reprojectImage(options);
 
