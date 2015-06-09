@@ -62,14 +62,6 @@ function reproject(srcpath, dstpath) {
   options.dst.geoTransform = info.geoTransform;
   options.dst.srs = options.t_srs;
 
-  console.log('process.env.UV_THREADPOOL_SIZE:',process.env.UV_THREADPOOL_SIZE);
-  console.log('bandCount:', bandCount);
-  console.log('blocksize:', src.bands.get(1).blockSize);
-  console.log('info.rasterSize.x:', info.rasterSize.x);
-  console.log('info.rasterSize.y:', info.rasterSize.y);
-  console.log('dataType:', dataType);
-  console.log('options:', options);
-
   gdal.reprojectImage(options);
 
   var colorInterps = getColorInterpretation(src);
