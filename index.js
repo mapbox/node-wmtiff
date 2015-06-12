@@ -27,7 +27,10 @@ function reproject(srcpath, dstpath) {
 
   var max_ram = 1500; //in MB, will use double the value: 1x GDAL_CACHE, 1x gdalwarp cache
 
-  process.env.UV_THREADPOOL_SIZE = Math.ceil(Math.max(4, require('os').cpus().length * 1.5));
+  var cpus = require('os').cpus().length;
+  var gdal_threads = cpus;
+
+  process.env.UV_THREADPOOL_SIZE = Math.ceil(Math.max(4, cpus * 1.5));
   gdal.config.set('GDAL_CACHEMAX', max_ram.toString());
 
   var src = gdal.open(srcpath);
@@ -40,7 +43,7 @@ function reproject(srcpath, dstpath) {
     s_srs: src.srs,
     t_srs: gdal.SpatialReference.fromEPSG(3857),
     memoryLimit: max_ram * 1024 * 1024,
-    options: ['NUM_THREADS=ALL_CPUS']
+    options: ['NUM_THREADS=' + gdal_threads.toString()]
   };
 
   var info = gdal.suggestedWarpOutput(options);
