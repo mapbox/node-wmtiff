@@ -25,13 +25,16 @@ function getColorInterpretation(src) {
 
 function reproject(srcpath, dstpath) {
 
-  var max_ram = 1500; //in MB, will use double the value: 1x GDAL_CACHE, 1x gdalwarp cache
+  //discussion about used parameters:
+  //https://github.com/mapbox/unpacker/issues/532#issuecomment-111710886
+
+  var warp_cache_max = 750; //MB
+  var gdal_cache_max = warp_cache_max * 3;
 
   var cpus = require('os').cpus().length;
-  var gdal_threads = cpus;
+  var gdal_threads = cpus; // * 1.5;
 
-  process.env.UV_THREADPOOL_SIZE = Math.ceil(Math.max(4, cpus * 1.5));
-  gdal.config.set('GDAL_CACHEMAX', max_ram.toString());
+  gdal.config.set('GDAL_CACHEMAX', gdal_cache_max.toString());
 
   var src = gdal.open(srcpath);
 
@@ -42,7 +45,7 @@ function reproject(srcpath, dstpath) {
     src: src,
     s_srs: src.srs,
     t_srs: gdal.SpatialReference.fromEPSG(3857),
-    memoryLimit: max_ram * 1024 * 1024,
+    memoryLimit: warp_cache_max * 1024 * 1024,
     options: ['NUM_THREADS=' + gdal_threads.toString()]
   };
 
