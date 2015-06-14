@@ -28,11 +28,12 @@ function reproject(srcpath, dstpath) {
   //discussion about used parameters:
   //https://github.com/mapbox/unpacker/issues/532#issuecomment-111710886
 
-  var warp_cache_max = 750; //MB
-  var gdal_cache_max = warp_cache_max * 3;
-
   var cpus = require('os').cpus().length;
   var gdal_threads = cpus; // * 1.5;
+  process.env.UV_THREADPOOL_SIZE = Math.ceil(Math.max(4, cpus * 1.5));
+
+  var warp_cache_max = 750; //MB
+  var gdal_cache_max = warp_cache_max * 3;
 
   gdal.config.set('GDAL_CACHEMAX', gdal_cache_max.toString());
 
@@ -46,6 +47,7 @@ function reproject(srcpath, dstpath) {
     s_srs: src.srs,
     t_srs: gdal.SpatialReference.fromEPSG(3857),
     memoryLimit: warp_cache_max * 1024 * 1024,
+    multi: true,
     options: ['NUM_THREADS=' + gdal_threads.toString()]
   };
 
