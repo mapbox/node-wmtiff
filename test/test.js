@@ -41,8 +41,10 @@ tape('reproject', function(assert) {
         for (var i = 0; i < src.geoTransform.length; i++) {
           equalEnough(assert, src.geoTransform[i], ctrl.geoTransform[i], 'correct geoTransform');
         }
-
-        assert.equal(src.bands.get(1).dataType, original.bands.get(1).dataType, 'correct datatype');
+        var new_band = src.bands.get(1);
+        var og_band = original.bands.get(1);
+        assert.equal(new_band.dataType, og_band.dataType, 'correct datatype');
+        assert.deepEqual(new_band.blockSize, {x:512,y:512}, 'correct blocksize');
         assert.ok(src.srs.isSame(sm), 'has projection information');
 
         fs.unlink(dstpath);
