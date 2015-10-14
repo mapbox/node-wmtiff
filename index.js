@@ -51,7 +51,8 @@ function reproject(srcpath, dstpath) {
   var creationOptions = [
     'TILED=YES',
     'BLOCKXSIZE=512',
-    'BLOCKYSIZE=512'
+    'BLOCKYSIZE=512',
+    'INTERLEAVE=BAND'
   ];
 
   options.dst = gdal.open(
