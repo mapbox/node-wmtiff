@@ -1,11 +1,11 @@
 {
   "name": "wmtiff",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "",
   "main": "index.js",
   "author": "Mapbox (https://www.mapbox.com)",
   "dependencies": {
-    "gdal": "~0.7.0"
+    "gdal": "~0.8.0"
   },
   "engines": {
     "node": "0.10.x"
