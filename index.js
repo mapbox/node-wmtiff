@@ -77,4 +77,9 @@ function reproject(srcpath, dstpath) {
 
   src.close();
   options.dst.close();
+
+  //safe measure to quickly release gdal's reference to the dataset
+  //needed if the dataset is processed by another tool immediately afterwards
+  src = null;
+  options.dst = null;
 }
