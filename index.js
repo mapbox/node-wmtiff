@@ -37,6 +37,12 @@ function reproject(srcpath, dstpath) {
   var bandCount = src.bands.count();
   var dataType = src.bands.get(1).dataType;
 
+  try {
+    src.srs.autoIdentifyEPSG();
+  } catch(err) {
+    throw err;
+  }
+
   var options = {
     src: src,
     s_srs: src.srs,

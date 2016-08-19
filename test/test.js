@@ -53,6 +53,21 @@ tape('reproject', function(assert) {
 
 });
 
+tape('failed reprojection: unsupported srs', function(assert) {
+  var filename = 'unsupported-srs.tif';
+  var datadir = path.join(__dirname, 'fixtures');
+  var srcpath = path.join(datadir, filename);
+  var dstpath = path.join(datadir, 'webmercator', filename);
+
+  try {
+    var res = wmtiff.reproject(srcpath, dstpath);
+  } catch(err) {
+    assert.ok(err, 'expected an error');
+    assert.equal(err.message, 'Unsupported SRS', 'expected message');
+    assert.end();
+  }
+})
+
 tape('teardown', function(assert) {
   var dir = path.join(__dirname, 'fixtures', 'webmercator');
   fs.rmdir(dir, function(error) {
