@@ -5,10 +5,7 @@
   "main": "index.js",
   "author": "Mapbox (https://www.mapbox.com)",
   "dependencies": {
-    "gdal": "~0.8.0"
-  },
-  "engines": {
-    "node": "0.10.x"
+    "gdal": "~0.9.3"
   },
   "devDependencies": {
     "tape": "3.0.x"
