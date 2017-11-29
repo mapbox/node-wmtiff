@@ -65,7 +65,11 @@ function reproject(srcpath, dstpath) {
   options.dst.geoTransform = info.geoTransform;
   options.dst.srs = options.t_srs;
 
-  gdal.reprojectImage(options);
+  try {
+    gdal.reprojectImage(options);
+  } catch (err) {
+    throw new Error('GDAL Reprojection Error');
+  }
 
   var colorInterps = getColorInterpretation(src);
   var noDataValues = getNoDataValues(src);
