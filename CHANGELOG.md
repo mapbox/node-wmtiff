@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+
+ - Handle tif reprojection errors as `EVALID`
+
 ## 0.4.0
 
  - Upgraded to node-gdal@0.9.3
