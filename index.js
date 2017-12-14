@@ -68,7 +68,7 @@ function reproject(srcpath, dstpath) {
   try {
     gdal.reprojectImage(options);
   } catch (err) {
-    throw new Error('GDAL Reprojection Error');
+    throw new Error('GDAL Reprojection Error ' + err.message);
   }
 
   var colorInterps = getColorInterpretation(src);
