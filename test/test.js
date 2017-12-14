@@ -60,3 +60,19 @@ tape('teardown', function(assert) {
   });
 
 });
+
+tape('reprojection error', function(assert) {
+  var datadir = path.join(__dirname, 'fixtures');
+  var srcpath = path.join(datadir, 'invalid-reprojection.tif');
+  var dstpath = path.join(datadir, 'invalid-reprojection-attempt.tif');
+
+  assert.throws(function(){wmtiff.reproject(srcpath, dstpath)},Error, "tif GDAL Reprojection Fails");
+  fs.unlink(dstpath);
+  assert.end();
+
+});
+
+  
+        
+
+
