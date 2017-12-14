@@ -23,6 +23,33 @@ function getColorInterpretation(src) {
   });
 }
 
+// for i in range(ds.RasterCount):
+//     ds.GetRasterBand(1).CheckSum()
+//     if gdal.GetLastErrorType() != 0:
+//         print(gdal.GetLastErrorType)
+//         sys.exit(1)
+
+// sys.exit(0)
+function getMethods(obj)
+{
+    var res = [];
+    for(var m in obj) {
+        if(typeof obj[m] == "function") {
+            res.push(m)
+        }
+    }
+    return res;
+}
+
+function checkTiffIsValid(src){
+  src.bands.forEach(function(b){
+    gdal.checksumImage(b);
+    if(gdal.lastError){
+      throw new Error('Corrupted Tiff! @ _ @')
+    }
+  }); 
+}
+
 function reproject(srcpath, dstpath) {
 
   var cpus = require('os').cpus().length;
@@ -33,6 +60,8 @@ function reproject(srcpath, dstpath) {
   gdal.config.set('GDAL_CACHEMAX', gdal_cache_max.toString());
 
   var src = gdal.open(srcpath);
+
+  checkTiffIsValid(src); 
 
   var bandCount = src.bands.count();
   var dataType = src.bands.get(1).dataType;
