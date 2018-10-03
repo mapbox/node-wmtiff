@@ -46,7 +46,11 @@ function reproject(srcpath, dstpath) {
     options: ['NUM_THREADS=' + cpus.toString()]
   };
 
-  var info = gdal.suggestedWarpOutput(options);
+  try {
+    var info = gdal.suggestedWarpOutput(options);
+  } catch (err) {
+    throw new Error('GDAL Bounds Error ' + err.message);
+  }
 
   var creationOptions = [
     'TILED=YES',
