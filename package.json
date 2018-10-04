@@ -1,6 +1,6 @@
 {
   "name": "wmtiff",
-  "version": "0.4.2-dev",
+  "version": "0.4.2",
   "description": "",
   "main": "index.js",
   "author": "Mapbox (https://www.mapbox.com)",
