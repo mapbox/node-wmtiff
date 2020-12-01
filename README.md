@@ -2,6 +2,8 @@
 
 Reproject a TIFF into web mercator using [`node-gdal`](https://github.com/naturalatlas/node-gdal/).
 
+[![Build Status](https://travis-ci.com/mapbox/node-wmtiff.svg?branch=master)](https://travis-ci.com/mapbox/node-wmtiff)
+
 ### Usage
 
 On the command line:
